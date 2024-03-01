@@ -1,0 +1,40 @@
+version: '3.8'
+services:
+  elasticsearch:
+    image: elasticsearch:7.17.15
+    container_name: elasticsearch
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=true
+      - ELASTIC_PASSWORD=ESPassword
+      - xpack.security.transport.ssl.enabled=false
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    volumes:
+      - esdata:/usr/share/elasticsearch/data
+    networks:
+      - elasticnet
+
+  kibana:
+    image: kibana:7.17.15
+    container_name: kibana
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+      - ELASTICSEARCH_USERNAME=elastic
+      - ELASTICSEARCH_PASSWORD=ESPassword
+    ports:
+      - "5601:5601"
+    depends_on:
+      - elasticsearch
+    networks:
+      - elasticnet
+
+volumes:
+  esdata:
+    driver: local
+
+networks:
+  elasticnet:
+    driver: bridge
+
